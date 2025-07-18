@@ -5,8 +5,8 @@ config.load_kube_config()
 v1 = client.CoreV1Api()
 print("The secrets values listed below are: ")
 print("----------------------------------------------------")
-secret_name="dev-info-recommendation"
-namespace="dev-convo-sphere"
+secret_name="enter the secret"
+namespace="enter you namespace"
 raw_secret = (v1.read_namespaced_secret(secret_name, namespace)).data
 for key, value in raw_secret.items():
 #   secret = (str(base64.b64decode(value).strip())).replace('b', '', 1) 
