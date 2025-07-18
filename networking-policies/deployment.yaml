@@ -1,0 +1,217 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-ui
+  namespace: test 
+  labels: 
+    app: frontend
+spec:
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - name: frontend-ui
+        image: nginx:latest  
+        resources:
+          limits:
+            memory: "16Mi"
+          requests: 
+            memory:  "8Mi"  
+        ports:
+        - containerPort: 80
+          protocol: TCP
+--- 
+apiVersion: v1 
+kind: Service
+metadata:
+  name: frontend-ui
+  namespace: test 
+  labels: 
+    app: frontend
+spec:
+  selector:
+    app: frontend
+  type: ClusterIP  
+  ports:
+  - port: 80
+    targetPort: 80
+    name: frontend
+--- 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-api
+  namespace: test 
+  labels: 
+    app: backend
+spec:
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: backend-api
+        image: nginx:latest
+        resources:
+          limits:
+            memory: "256Mi"
+          requests: 
+            memory:  "128Mi"  
+        ports:
+        - containerPort: 80
+          protocol: TCP
+--- 
+apiVersion: v1 
+kind: Service
+metadata:
+  name: backend-api
+  namespace: test 
+  labels: 
+    app: backend
+spec:
+  selector:
+    app: backend
+  type: ClusterIP  
+  ports:
+  - port: 80
+    targetPort: 80
+    name: backend
+---        
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: core
+  namespace: test 
+  labels: 
+    app: core-py
+spec:
+  selector:
+    matchLabels:
+      app: core-py
+  template:
+    metadata:
+      labels:
+        app: core-py
+    spec:
+      containers:
+      - name: core
+        image: nginx:latest
+        resources:
+          limits:
+            memory: "16Mi"
+          requests: 
+            memory:  "8Mi"  
+        ports:
+        - containerPort: 80
+          protocol: TCP
+--- 
+apiVersion: v1 
+kind: Service
+metadata:
+  name: core
+  namespace: test 
+  labels: 
+    app: core-py
+spec:
+  selector:
+    app: core-py
+  type: ClusterIP  
+  ports:
+  - port: 80
+    targetPort: 80
+    name: core-py
+--- 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: apps-py
+  name: apps
+  namespace: test
+spec:
+  replicas: 1
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: apps-py
+  template:
+    metadata:
+      labels:
+        app: apps-py
+    spec:
+      containers:
+      - image: nginx:latest
+        imagePullPolicy: Always
+        name: nginx
+        resources:
+          limits:
+            memory: "16Mi"
+          requests: 
+            memory:  "8Mi"         
+        ports: 
+        - containerPort: 80
+          protocol: TCP
+--- 
+# sericce for fourth pod
+apiVersion: v1 
+kind: Service
+metadata:
+  name: apps
+  namespace: test 
+  labels: 
+    app: apps-py
+spec:
+  selector:
+    app: apps-py
+  type: ClusterIP  
+  ports:
+  - port: 80
+    targetPort: 80
+    name: apps-py
+---
+apiVersion: networking.k8s.io/v1 
+kind: NetworkPolicy 
+metadata: 
+  name: frontend-ui-networking 
+  namespace: test 
+spec: 
+  podSelector: 
+    matchLabels: 
+      app: frontend 
+  policyTypes: 
+    - Egress 
+    - Ingress
+  egress: 
+  - to: 
+    - podSelector: 
+        matchExpressions: 
+        - key: app
+          operator: In 
+          values: [apps-py, core-py]
+    ports: 
+    - protocol: TCP 
+      port: 80
+      
+  - to: []
+    ports:
+    - protocol: UDP
+      port: 53
+    - protocol: TCP
+      port: 53
+  ingress: 
+  - from: 
+    - podSelector: 
+        matchLabels: 
+          app: core-py    
+    ports:
+    - protocol: TCP 
+      port: 80 

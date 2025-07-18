@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp1
+  namespace: taints
+  labels: 
+    app: prod
+spec:
+  replicas: 20
+  selector: 
+    matchLabels:
+      app: prod
+  template:
+    metadata:
+      labels:
+        app: prod
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              # - key: "storag"
+              #   operator: In 
+              #   values: 
+              #     - ssd 
+              # - key: "env"    # these two key defines the and i.e. if both the labels are there with for nay node then it will be scheduled otherwise not 
+              #   operator: In 
+              #   values: 
+              #     - prod
+              - key: "env"
+                operator: "In"
+                values:              # this key section defines the and portion 
+                  - prod 
+                  - dev
+                
+                                
+      containers:
+      - name: myapp1
+        image: nginx:latest
+

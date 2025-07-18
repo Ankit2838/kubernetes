@@ -1,0 +1,57 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: mypod1
+  namespace: taints 
+  labels:  
+    app: taint 
+spec:
+  selector:
+    matchLabels:
+      app: taint
+  template:
+    metadata:
+      labels:
+        app: taint
+    spec:
+      tolerations:
+        - key: "env" 
+          operator: "Exists"
+          effect: NoExecute
+      containers:
+      - name: mycontainer1
+        image: nginx
+  
+
+--- 
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: mypod2
+  namespace: taints 
+  labels:  
+    app: backend 
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      tolerations: 
+        - key: "first"
+          operator: "Equal"
+          value: "cluster"
+          effect: "NoSchedule"
+      containers:
+      - name: mycontainer2
+        image: nginx
+        resources:
+          limits:
+            memory: "32Mi"
+          requests: 
+            memory: "16Mi"    
+  

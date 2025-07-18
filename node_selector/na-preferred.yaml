@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp1
+  namespace: taints
+  labels: 
+    app: prod
+spec:
+  replicas: 20
+  selector: 
+    matchLabels:
+      app: prod
+  template:
+    metadata:
+      labels:
+        app: prod
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: "env"
+                operator: "In"
+                values:              
+                  - prod 
+                  - dev  
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 10     
+              preference: 
+                matchExpressions: 
+                - key: "env"
+                  operator: "In"
+                  values: 
+                    - prod 
+            - weight: 5 
+              preference: 
+                matchExpressions: 
+                - key: "env"
+                  operator: "In"
+                  values: 
+                    - dev            
+      containers:
+      - name: myapp1
+        image: nginx:latest
+
