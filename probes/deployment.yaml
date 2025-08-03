@@ -34,7 +34,7 @@ spec:
         httpGet: 
           path: /heathz 
           port: 8080
-          httpsHeaders: 
+          httpHeaders: 
             - name: Custom-Header 
               value: livenessProbe 
         initialDelaySeconds: 3 

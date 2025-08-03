@@ -1,25 +1,112 @@
-apiVersion: apps/v1
+apiVersion: apps/v1 
 kind: Deployment
 metadata:
-  labels:
-    app: apps
-  name: apps
+  name: test
   namespace: test
+  labels: 
+    app: dev
 spec:
-  replicas: 1
-  revisionHistoryLimit: 2
   selector:
     matchLabels:
-      app: apps
+      app: dev
   template:
     metadata:
       labels:
-        app: apps
+        app: dev
     spec:
       containers:
-      - image: nginx:latest
-        imagePullPolicy: Always
-        name: nginx
+      - name: test
+        image: nginx 
+--- 
+apiVersion: apps/v1 
+kind: Deployment
+metadata:
+  name: debug
+  namespace: test
+  labels: 
+    app: prod
+spec:
+  selector:
+    matchLabels:
+      app: prod
+  template:
+    metadata:
+      labels:
+        app: prod
+    spec:
+      containers:
+      - name: debug
+        image: nginx 
+--- 
+apiVersion: apps/v1 
+kind: Deployment
+metadata:
+  name: feature
+  namespace: test 
+  labels: 
+    app: preprod
+spec:
+  selector:
+    matchLabels:
+      app: preprod
+  template:
+    metadata:
+      labels:
+        app: preprod
+    spec:
+      containers:
+      - name: feature
+        image: nginx                
+---
+apiVersion: apps/v1 
+kind: Deployment
+metadata:
+  name: feature2
+  namespace: test 
+  labels: 
+    app: predev
+spec:
+  selector:
+    matchLabels:
+      app: predev
+  template:
+    metadata:
+      labels:
+        app: predev
+    spec:
+      containers:
+      - name: feature2
+        image: nginx 
+---
+apiVersion: networking.k8s.io/v1 
+kind: NetworkPolicy 
+metadata: 
+  name: test-network-policy
+  namespace: test 
+spec: 
+  podSelector:
+    matchLabels:
+      app: dev 
+  policyTypes: 
+    - Ingress 
+    - Egress 
+  egress: 
+  - to: 
+    - podSelector: 
+        matchExpressions: 
+        - key: "app" 
+          operator: "In" 
+          values: 
+            - prod 
+  - to: []
+    ports:
+    - protocol: UDP
+      port: 53
+    - protocol: TCP
+      port: 53              
 
-
-
+  ingress: 
+  - from: 
+    - podSelector:
+        matchLabels:
+          app: predev

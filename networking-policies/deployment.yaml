@@ -16,15 +16,8 @@ spec:
     spec:
       containers:
       - name: frontend-ui
-        image: nginx:latest  
-        resources:
-          limits:
-            memory: "16Mi"
-          requests: 
-            memory:  "8Mi"  
-        ports:
-        - containerPort: 80
-          protocol: TCP
+        image: nginx:latest
+
 --- 
 apiVersion: v1 
 kind: Service
@@ -210,8 +203,10 @@ spec:
   ingress: 
   - from: 
     - podSelector: 
-        matchLabels: 
-          app: core-py    
+        matchExpressions: 
+        - key: app
+          operator: In 
+          values: [apps-py, core-py]  
     ports:
     - protocol: TCP 
       port: 80 

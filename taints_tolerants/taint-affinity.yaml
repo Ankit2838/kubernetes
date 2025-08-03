@@ -1,0 +1,31 @@
+apiVersion: apps/v1 
+kind: Deployment
+metadata:
+  name: test
+  namespace: test
+  labels: 
+    app: test-taint
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: test-taint
+  template:
+    metadata:
+      labels:
+        app: test-taint
+    spec:
+      containers:
+      - name: test
+        image: nginx:latest
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+                - key: "node-types"
+                  operator: "In"
+                  values: 
+                  - "sensitive"
+
+

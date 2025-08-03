@@ -1,0 +1,40 @@
+---
+apiVersion: apps/v1 
+kind: Deployment
+metadata:
+  name: frontend-pod 
+  namespace: test 
+  labels: 
+    app: frontend
+spec:
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - name: frontend-pod
+        image: nginx
+        volumeMounts: 
+          - name: pvc-volume 
+            mountPath: /mnt/data 
+            readOnly: true 
+      volumes: 
+        - name: pvc-volume 
+          persistentVolumeClaim: 
+            claimName: pvc-claim  
+--- 
+apiVersion: v1 
+kind: PersistentVolumeClaim 
+metadata: 
+  name: pvc-claim 
+  namespace: test 
+spec: 
+  accessModes: [ReadWriteOnce] 
+  resources: 
+    requests: 
+      storage: 500Mi 
+

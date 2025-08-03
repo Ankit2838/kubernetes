@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: private-image-repo
+  namespace: test
+  labels:
+    app: image-pull
+spec:
+  selector:
+    matchLabels:
+      app: image-pull
+  template:
+    metadata:
+      labels:
+        app: image-pull
+    spec:
+      serviceAccountName: sa-devops
+      containers:
+      - name: image-pull
+        image: ankit2838/flask:1.0.1
+        resources:
+          limits:
+            memory: "60Mi"
+          requests: 
+            memory: "30Mi"    
+        ports:
+        - containerPort: 5000
+          protocol: TCP

@@ -22,3 +22,7 @@ spec:
       - name: myapp1
         image: nginx:latest
 
+--- 
+# node-selector: is a strict rule and labls are applied to nodes 
+# if a pod is haivng node-slector in spec section of deployment only then pod will be schedule to that node otherwise it wont schedule to that node as well as other nodes too
+#Affinity: with ad=ffinity we define that a particular node will mount to that node but if it wont find the node than it will schedule onto other node 
