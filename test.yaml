@@ -1,0 +1,12 @@
+apiVersion: v1 
+kind: Pod
+metadata:
+  name: pod 
+  namespace: test   
+spec:
+  imagePullSecrets: 
+    - name: doccred
+  containers:
+  - name: pod
+    image: ankit2838/flask:1.0.1
+

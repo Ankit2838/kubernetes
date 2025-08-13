@@ -1,0 +1,12 @@
+fullnameOverride: test-argocd
+crds:
+  install: false
+
+repoServer: 
+  image: 
+    repository: <image-name>
+    tag: latest
+configs:
+  cm:
+    application.instanceLabelKey: test-argocd 
+
